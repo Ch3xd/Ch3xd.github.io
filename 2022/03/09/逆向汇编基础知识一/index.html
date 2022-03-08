@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Ch3xd">
+
+
+
+
+
+<title>逆向汇编基础知识一 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Bentham&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Bentham&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">逆向汇编基础知识一</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Ch3xd</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">March 9, 2022&nbsp;&nbsp;4:18:06</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h3 id="1、汇编单位基础知识"><a href="#1、汇编单位基础知识" class="headerlink" title="1、汇编单位基础知识"></a>1、汇编单位基础知识</h3><blockquote>
+<p>单元    位    字节</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>单元</th>
+<th>位</th>
+<th>字节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BIT（是计算机最小的存储单元）</td>
+<td>位</td>
+<td>0   1</td>
+</tr>
+<tr>
+<td>BYTE</td>
+<td>字节</td>
+<td>一个字节包含8个位</td>
+</tr>
+<tr>
+<td>WORD</td>
+<td>字</td>
+<td>包含2个字节，16位，FFFFh（65535d）</td>
+</tr>
+<tr>
+<td>DOUBLE WORD</td>
+<td>双字节</td>
+<td>包含4个字节，32位，最大值为 FFFFFFFF(4294967295)</td>
+</tr>
+<tr>
+<td>long</td>
+<td>八字节</td>
+<td>包含8个字节，64位</td>
+</tr>
+<tr>
+<td>KILOBYTE</td>
+<td>千字</td>
+<td>1024字节</td>
+</tr>
+<tr>
+<td>MEGABYTE</td>
+<td>兆字</td>
+<td>1024*1024字节</td>
+</tr>
+</tbody></table>
+<h3 id="2、汇编基础知识"><a href="#2、汇编基础知识" class="headerlink" title="2、汇编基础知识"></a>2、汇编基础知识</h3><h4 id="基本常用寄存器（CPU中的内存）"><a href="#基本常用寄存器（CPU中的内存）" class="headerlink" title="基本常用寄存器（CPU中的内存）"></a>基本常用寄存器（CPU中的内存）</h4><table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>声明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EAX</td>
+<td>累加器</td>
+</tr>
+<tr>
+<td>EBX</td>
+<td>基地址寄存器</td>
+</tr>
+<tr>
+<td>ECX</td>
+<td>计数器</td>
+</tr>
+<tr>
+<td>EDX</td>
+<td>数据寄存器</td>
+</tr>
+<tr>
+<td>ESI</td>
+<td>源变址寄存器</td>
+</tr>
+<tr>
+<td>EDI</td>
+<td>目的变址寄存器</td>
+</tr>
+<tr>
+<td>EBP</td>
+<td>栈底寄存器（用来恢复栈平衡）</td>
+</tr>
+<tr>
+<td>ESP</td>
+<td>栈顶寄存器（入栈和出栈都是从ESP开始）</td>
+</tr>
+<tr>
+<td>EIP</td>
+<td>指针寄存器（程序运行到哪EIP就指到哪里）</td>
+</tr>
+</tbody></table>
+<h4 id="比较重要的三个寄存器："><a href="#比较重要的三个寄存器：" class="headerlink" title="比较重要的三个寄存器："></a>比较重要的三个寄存器：</h4><table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>声明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EBP</td>
+<td>栈低寄存器（即高位地址），保存栈存栈顶的地址，用来赋值给ESP，来恢复栈平衡</td>
+</tr>
+<tr>
+<td>ESP</td>
+<td>栈顶寄存器（即低位地址）</td>
+</tr>
+<tr>
+<td>EIP</td>
+<td>指令指针寄存器（指向程序当前运行到的内存地址）</td>
+</tr>
+</tbody></table>
+<p>栈的基本机构图（先入后出，从高位向地位发展）：</p>
+<p><img src="/images/ChackSf/hb_2.jpg" alt="image-20211122104214355"></p>
+<p>总结：EBP用来保存原始栈地址，帮助ESP恢复栈平衡</p>
+<p>栈平衡汇编代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">push ebp		;首先压入ebp,esp-4</span><br><span class="line">mov ebp,esp		;再把esp的指针赋值给ebp保存</span><br><span class="line">.....</span><br><span class="line">mov esp,ebp		;esp+4</span><br><span class="line">pop ebp</span><br></pre></td></tr></table></figure>
+
+<p>POP指令：会将esp所指向的栈顶第一个字传送到目的地址，esp的指针都会增加 esp+4</p>
+<p>POSH指令：esp - 4</p>
+<p>ret 返回指令：返回到上一次执行的地址</p>
+<p>retn ：在返回前清理栈</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ret digit</span><br></pre></td></tr></table></figure>
+
+<p>sub 减指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sub dec src		;源 - 目的 然后赋值给源</span><br></pre></td></tr></table></figure>
+
+<p>test：用来测试eax的值是否为0</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">test eax,eax</span><br></pre></td></tr></table></figure>
+
+<p>XOR：异或</p>
+<h3 id="3、单字节寄存器"><a href="#3、单字节寄存器" class="headerlink" title="3、单字节寄存器"></a>3、单字节寄存器</h3><table>
+<thead>
+<tr>
+<th>字节寄存器</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CS</td>
+<td>代码段寄存器</td>
+</tr>
+<tr>
+<td>DS</td>
+<td>数据段寄存器</td>
+</tr>
+<tr>
+<td>ES</td>
+<td>附加段寄存器</td>
+</tr>
+<tr>
+<td>SS</td>
+<td>栈段寄存器</td>
+</tr>
+</tbody></table>
+<p>在汇编代码里一般表现为：<code>CS:DWORD</code></p>
+<h3 id="4、状态寄存器"><a href="#4、状态寄存器" class="headerlink" title="4、状态寄存器"></a>4、状态寄存器</h3><table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ZF（零标志位）</td>
+<td>上一个计算的结果为0，值为1，反之为0</td>
+</tr>
+<tr>
+<td>OF（溢出标志位）</td>
+<td>上一步操作改变了某寄存器的最高有效为，OF被设置为1</td>
+</tr>
+<tr>
+<td>CF（异位）</td>
+<td>产生溢出的时候会被设置为1</td>
+</tr>
+</tbody></table>
+<h3 id="5、比较与跳转寄存器"><a href="#5、比较与跳转寄存器" class="headerlink" title="5、比较与跳转寄存器"></a>5、比较与跳转寄存器</h3><table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>cmp（比较寄存器）</td>
+<td>两个（ascii）相减，要么是1，要么是0，会影响到ZF位</td>
+</tr>
+<tr>
+<td>jz（Jump zero）</td>
+<td>为0的时候跳转</td>
+</tr>
+<tr>
+<td>jnz （Jump not zero）</td>
+<td>不为零的时候跳转</td>
+</tr>
+<tr>
+<td>jmp（jump）</td>
+<td>无条件跳转</td>
+</tr>
+</tbody></table>
+<p>伪汇编代码解读：当cmp的比较为0的时候，跳转到func1，否则跳转到func2</p>
+<blockquote>
+<p>注：计算机只会做减法，cmp指令只会算出0或1</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cmp sec src  ;src减sec的结果</span><br><span class="line">jz func1</span><br><span class="line">jnz func2</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="6、段偏移"><a href="#6、段偏移" class="headerlink" title="6、段偏移"></a>6、段偏移</h3><blockquote>
+<p> 段：内存段</p>
+</blockquote>
+<p>32位的段范围：00000000 - FFFFFFFF</p>
+<blockquote>
+<p>段（基址） + 偏移量 &#x3D; 内存地址</p>
+</blockquote>
+<h3 id="7、栈"><a href="#7、栈" class="headerlink" title="7、栈"></a>7、栈</h3><blockquote>
+<p>先进后出的一个存储结构。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>汇编指令</th>
+<th>声明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PUSH</td>
+<td>压入数据（也就是压入栈）+ 4</td>
+</tr>
+<tr>
+<td>POP</td>
+<td>弹出数据，也可以理解为取出数据 - 4</td>
+</tr>
+</tbody></table>
+<p>栈结构图：</p>
+<p><img src="/images/ChackSf/hb_3.jpg" alt="image-20211122114915711"></p>
+<blockquote>
+<p>栈溢出漏洞：栈的数据溢出只会往高位增长</p>
+</blockquote>
+<h3 id="8、逆向中常用的汇编指令"><a href="#8、逆向中常用的汇编指令" class="headerlink" title="8、逆向中常用的汇编指令"></a>8、逆向中常用的汇编指令</h3><blockquote>
+<p>指令的值通常是以16进制存储的！！！</p>
+<p>汇编就是二进制，只是汇编多了个助记符！！</p>
+</blockquote>
+<h5 id="0、window汇编指令组成"><a href="#0、window汇编指令组成" class="headerlink" title="0、window汇编指令组成"></a>0、window汇编指令组成</h5><p>汇编指令格式由四部分组成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">标号:指令助记符 目的操作符,源操作符;注释</span><br></pre></td></tr></table></figure>
+
+<h5 id="1、算数运算指令"><a href="#1、算数运算指令" class="headerlink" title="1、算数运算指令"></a>1、算数运算指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add</span><br><span class="line">and</span><br></pre></td></tr></table></figure>
+
+<p>add指令几个案例解读：</p>
+<p><code>add eax,ebx</code>：把ebx与eax相加，然后赋值给eax</p>
+<p><code>add eax,0x123</code>：把0x123与eax相加，然后赋值给eax</p>
+<p><code>add eax,dword ptr [404000]</code>：赋值一个双字节的地址，这里的dword ptr是一个取值指令或取地址指令</p>
+<blockquote>
+<p>注：不能做两个地址的运算</p>
+</blockquote>
+<h5 id="2、数据转移动指令"><a href="#2、数据转移动指令" class="headerlink" title="2、数据转移动指令"></a>2、数据转移动指令</h5><p><code>mov</code>指令用于将一个值写入某个寄存器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov	%eax,[%esp+8]	;将esp寄存器加8后赋值给eax寄存器</span><br></pre></td></tr></table></figure>
+
+<h5 id="3、程序控制指令"><a href="#3、程序控制指令" class="headerlink" title="3、程序控制指令"></a>3、程序控制指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">jz			;为0时跳转</span><br><span class="line">jnz			;不为0时跳转</span><br><span class="line">ja			;大于跳转</span><br><span class="line">jae			;大于等于跳转</span><br><span class="line">jmp			;无条件跳转</span><br><span class="line">call		;调用函数指令</span><br><span class="line">lea	des src		;取地址指令</span><br><span class="line">DWORD PTR [ADDRESS]  ;取地址中的值</span><br><span class="line">or eax ebx	;判断eax与ebx是否同时为0或同时为1,如果有一方为1,么结果就为1</span><br></pre></td></tr></table></figure>
+
+<p>window中的字节存储方式是：小端序的（地位在前、高位在后）</p>
+<p>列如：</p>
+<p>0x4567在内存的存储方式分为：0x67 0x45</p>
+<p>lea的广泛用途：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lea eax,wword ptr[4*ecx+ebx]	;将eax赋值为4*ecx+ebx</span><br><span class="line">mov eax,wword ptr[4*ecx+ebx]	;将eax赋值为4*ecx+ebx的值</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="4、主要指令讲解"><a href="#4、主要指令讲解" class="headerlink" title="4、主要指令讲解"></a>4、主要指令讲解</h4><p>CMP 指令会影响的标志位为：CF OF ZF</p>
+<p>DEC 指令影响的标志位：ZF OF</p>
+<p>DIV 除法指令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov eax,64</span><br><span class="line">mov ecx,9</span><br><span class="line">div ecx			;eax/ecx，结果保存在eax，莫存在ecx</span><br></pre></td></tr></table></figure>
+
+<p>DIV指令可以改变的标志位：CF OF ZF</p>
+<p>IMUL 乘法指令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IMUL eax,0x5			;0x5与eax相乘，然后赋值给eax</span><br><span class="line">IMUL eax,0x5,0x6		;0x5与0x6相乘，然后赋值给eax</span><br></pre></td></tr></table></figure>
+
+<p>IMUL也可以改变CF OF为</p>
+<p>INC 自加1</p>
+<p>INT </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int 目标数</span><br></pre></td></tr></table></figure>
+
+
+
+<p>MOV  转移指令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">movs	;将esi指向的内容传送到edi指向的内容中去</span><br><span class="line">movsx	;单字节或单字节拼凑为双字节传送</span><br><span class="line">movzx	;单字节或单字节拼凑为双字节传送</span><br></pre></td></tr></table></figure>
+
+<p>nop  无用指令</p>
+<p><strong>通常用来设置验证算法使它无用</strong></p>
+<p>or 或指令</p>
+<p>or指令会清空OF位和 CF位 然后设置ZF位</p>
+<h3 id="9、jumps系列跳转指令"><a href="#9、jumps系列跳转指令" class="headerlink" title="9、jumps系列跳转指令"></a>9、jumps系列跳转指令</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>触发条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ja（大于跳转）</td>
+<td>cf&#x3D;0 and zf&#x3D;0</td>
+</tr>
+<tr>
+<td>jae（大于或等于就跳转）</td>
+<td>cf&#x3D;0</td>
+</tr>
+<tr>
+<td>jb（小于跳转）</td>
+<td>cf&#x3D;1</td>
+</tr>
+<tr>
+<td>jbe（小于等于跳转）</td>
+<td>cf&#x3D;1 or zf&#x3D;1</td>
+</tr>
+<tr>
+<td>je（相等就跳转）</td>
+<td>zf&#x3D;1</td>
+</tr>
+<tr>
+<td>jecxz（ecx为0跳转）</td>
+<td>ecx&#x3D;0</td>
+</tr>
+<tr>
+<td>jg（大于就跳转-有符号跳转）</td>
+<td>ZF&#x3D;0 and SF&#x3D;OF</td>
+</tr>
+<tr>
+<td>jge（大于或等于跳转-有符号跳转）</td>
+<td>SF&#x3D;OF</td>
+</tr>
+<tr>
+<td>jl（小于就跳转-有符号）</td>
+<td>SF!&#x3D;OF</td>
+</tr>
+<tr>
+<td>jle（小于或等于就跳转 - 有符号）</td>
+<td>ZF&#x3D;1 and OF!&#x3D;OF</td>
+</tr>
+<tr>
+<td>jmp（无条件条件）</td>
+<td>无</td>
+</tr>
+<tr>
+<td>je（等于就跳转）</td>
+<td>ZF&#x3D;1</td>
+</tr>
+<tr>
+<td>jne（不等于就跳转）</td>
+<td>ZF&#x3D;0</td>
+</tr>
+<tr>
+<td>jpe（如果是偶数就跳转）</td>
+<td>PF&#x3D;1</td>
+</tr>
+<tr>
+<td>jpo（如果是奇数就跳转）</td>
+<td>PF&#x3D;0</td>
+</tr>
+<tr>
+<td>js（SF被标记就跳转）</td>
+<td>SF&#x3D;1</td>
+</tr>
+<tr>
+<td>jo（of被标记就跳转）</td>
+<td>OF&#x3D;1</td>
+</tr>
+<tr>
+<td>jz（如果等于0就跳转）</td>
+<td>ZF&#x3D;1</td>
+</tr>
+<tr>
+<td>jc（cf位等于1的时候跳转）</td>
+<td>cf&#x3D;1</td>
+</tr>
+<tr>
+<td>jcxz</td>
+<td>cf&#x3D;0</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Ch3xd</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://ch3xd.github.io/2022/03/09/%E9%80%86%E5%90%91%E6%B1%87%E7%BC%96%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%B8%80/">http://ch3xd.github.io/2022/03/09/%E9%80%86%E5%90%91%E6%B1%87%E7%BC%96%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%B8%80/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%B1%87%E7%BC%96%E5%9F%BA%E7%A1%80/"># 汇编基础</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/03/09/hello-world/">Hello World</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Ch3xd | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

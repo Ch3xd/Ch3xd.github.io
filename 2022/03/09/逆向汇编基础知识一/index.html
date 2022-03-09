@@ -416,8 +416,30 @@
 </blockquote>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cmp sec src  ;src减sec的结果</span><br><span class="line">jz func1</span><br><span class="line">jnz func2</span><br></pre></td></tr></table></figure>
 
-
-
+<table>
+<thead>
+<tr>
+<th>CMP结果</th>
+<th>ZF</th>
+<th>CF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目的操作数 &lt; 源操作数</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>目的操作数 &gt; 源操作数</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>目的操作数 &#x3D; 源操作数</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody></table>
 <h3 id="6、段偏移"><a href="#6、段偏移" class="headerlink" title="6、段偏移"></a>6、段偏移</h3><blockquote>
 <p> 段：内存段</p>
 </blockquote>
@@ -639,6 +661,8 @@
             </div>
         </section>
         <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/03/10/%E9%80%86%E5%90%91%E4%B9%8BPE%E7%BB%93%E6%9E%84DOS%E5%A4%B4%E8%A7%A3%E6%9E%90/">逆向之PE结构DOS头解析</a>
             
             
         </section>

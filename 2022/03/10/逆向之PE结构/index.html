@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Ch3xd">
+
+
+
+
+
+<title>逆向之PE结构 | Hexo</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Ch3xd&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Ch3xd&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">逆向之PE结构</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Ch3xd</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">March 10, 2022&nbsp;&nbsp;1:51:25</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="逆向破解基础之PE结构"><a href="#逆向破解基础之PE结构" class="headerlink" title="逆向破解基础之PE结构"></a>逆向破解基础之PE结构</h1><h3 id="1、PE结构"><a href="#1、PE结构" class="headerlink" title="1、PE结构"></a>1、PE结构</h3><p><img src="/images/ChackSf/hb_4.jpg" alt="image-20211122153746608"></p>
+<ul>
+<li><p>DOS头</p>
+</li>
+<li><p>NT头（内核头）</p>
+<ul>
+<li>PE签名</li>
+<li>PE整个的校验位</li>
+<li>PE文件头PE可选头</li>
+</ul>
+</li>
+<li><p>PE可选头</p>
+</li>
+<li><p>节表</p>
+</li>
+<li><p>.idata段</p>
+</li>
+<li><p>.text段</p>
+</li>
+<li><p>.data段</p>
+</li>
+</ul>
+<p>idata段和data段的区别：</p>
+<p>data段就是个数据段，是要存全局变量或者字符串之类的。</p>
+<p>idata段就是import的函数代码段，是导入的外代码段的地址，就是函数的带入表。</p>
+<h3 id="2、PE装载器加载过程"><a href="#2、PE装载器加载过程" class="headerlink" title="2、PE装载器加载过程"></a>2、PE装载器加载过程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">第一步、PE装载器首先检查DOS header里的pe header的偏移量</span><br><span class="line">第二步、如果找到，则直接跳转到PE header的位置</span><br><span class="line">第三步、跳转到pe header之后，检查pe header是否有效，检查pe header的方法主要检查结构类型和校验PE签名等。</span><br><span class="line">第四步：如果有效，就跳转到pe header的尾部，紧跟着pe header尾部的是节表</span><br><span class="line">第五步：开始读取节表中的节段信息，采用文件映射的方式，将这些读取的节段映射到内存中，同时加上这些节段的读写属性</span><br><span class="line">第六步: PE文件映射到内存后，PE装载器就会继续处理导入表的逻辑结构,将导入表中的函数地址映射到pe文件中的idata段里面。然后结束。</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、偏移算地址"><a href="#3、偏移算地址" class="headerlink" title="3、偏移算地址"></a>3、偏移算地址</h3><p>offset（偏移地址） 算地址，存在于PE中固定不变的值</p>
+<p>如果偏移地址是0x1233，就是RVA</p>
+<p>那么实际的地址就是：0x1024 + 0x400000</p>
+<p>32位映射的内存大小标准为：4G虚拟地址</p>
+<h5 id="VA（virtual-address）"><a href="#VA（virtual-address）" class="headerlink" title="VA（virtual address）"></a>VA（virtual address）</h5><p>进程绝对虚拟地址，是在进程地址空间中能访问的一个实际的地址。</p>
+<h5 id="RVA（Relative-virtual-address）"><a href="#RVA（Relative-virtual-address）" class="headerlink" title="RVA（Relative virtual address）"></a>RVA（Relative virtual address）</h5><p>相对虚拟地址，是不能直接访问的地址，在OD中显示的都是RVA。PE Header中的地址信息大部分是以RVA的形式存在的。</p>
+<h5 id="ImageBase"><a href="#ImageBase" class="headerlink" title="ImageBase"></a>ImageBase</h5><p>映射基址，是pe文件文件头推荐映射入内存的开始地址，一般为0x00400000<br><code>RVA + ImageBase = VA</code></p>
+<h5 id="理解："><a href="#理解：" class="headerlink" title="理解："></a>理解：</h5><p>加载在内存中的地址都是RVA相对虚拟地址，如果程序想访问实际的一个地址的话需要加上ImageBase才能访问得到，这个实际的地址就是VA。</p>
+<h5 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h5><p>所以在逆向破解中一般要找的偏移地址就是ImageBase的地址。</p>
+<h5 id="在x86的下"><a href="#在x86的下" class="headerlink" title="在x86的下"></a>在x86的下</h5><p>系统会在程序运行的时候为当前程序分配有个4G大小的内存虚拟空间</p>
+<p>一般会PE头的映射基址是0x400000</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Ch3xd</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://ch3xd.github.io/2022/03/10/%E9%80%86%E5%90%91%E4%B9%8BPE%E7%BB%93%E6%9E%84/">http://ch3xd.github.io/2022/03/10/%E9%80%86%E5%90%91%E4%B9%8BPE%E7%BB%93%E6%9E%84/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/03/10/%E9%80%86%E5%90%91%E4%B9%8BPE%E7%BB%93%E6%9E%84DOS%E5%A4%B4%E8%A7%A3%E6%9E%90/">逆向之PE结构DOS头解析</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Ch3xd | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

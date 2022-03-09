@@ -13,7 +13,7 @@
 
 
 
-<title>汇编代码简单解读与分析 | Hexo</title>
+<title>简单破解之修改EP点 | Hexo</title>
 
 
 
@@ -193,7 +193,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">汇编代码简单解读与分析</h1>
+            <h1 class="post-title">简单破解之修改EP点</h1>
             
                 <div class="post-meta">
                     
@@ -202,7 +202,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">March 10, 2022&nbsp;&nbsp;2:08:18</a>
+                        Date: <a href="#">March 10, 2022&nbsp;&nbsp;2:21:36</a>
                         </span>
                     
                     
@@ -211,13 +211,42 @@
         </header>
 
         <div class="post-content">
-            <h3 id="1-简单代码解读"><a href="#1-简单代码解读" class="headerlink" title="1. 简单代码解读"></a>1. 简单代码解读</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">push    <span class="number">0</span>               ; uType</span><br><span class="line">push    offset Caption  ; <span class="string">&quot;Register Me&quot;</span></span><br><span class="line">push    offset aOopsIAmNotRegi ; <span class="string">&quot;Oops! I am not registered !!&quot;</span></span><br><span class="line">push    <span class="number">0</span>               ; hWnd</span><br><span class="line">call    MessageBoxA</span><br></pre></td></tr></table></figure>
-
-<p>在汇编里面参数的压入是从右往左压的，转出C语言后就是下面的代码</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MessageBoxA(hWnd,aOopsIAmNotRegi,Caption,uType)</span><br></pre></td></tr></table></figure>
-
-<p>也可以IDA使用F5查看伪代码：</p>
-<p><img src="/images/ChackSf/rgme_14.png" alt="image-20220307150845177"></p>
+            <h1 id="一、逆向破解之修改EP点"><a href="#一、逆向破解之修改EP点" class="headerlink" title="一、逆向破解之修改EP点"></a>一、逆向破解之修改EP点</h1><p><strong>这里的EP点指的是：PE OPTION中的AddressOfEntryPoint —&gt;程序的入口点（基址）</strong></p>
+<p>破解的目标软件为：registerme.exe</p>
+<p><img src="/images/ChackSf/rgme_1.png" alt="image-20220306191424085"></p>
+<p>简单实用这个软件后发现弹了三个框，分别是：</p>
+<p><img src="/images/ChackSf/rgme_23.png" alt="image-20220306191845847"></p>
+<p>Register We ! Wait no longer :))</p>
+<p><img src="/images/ChackSf/rgme_3.png" alt="image-20220306191905821"></p>
+<p>最后一个窗口</p>
+<p><img src="E:\逆向破解-游戏攻破\My-笔记\逆向基础\基础二\img\rgme_4.png" alt="image-20220306192003387"></p>
+<h3 id="1-首先使用IDA查看一下程序的基本结构"><a href="#1-首先使用IDA查看一下程序的基本结构" class="headerlink" title="1. 首先使用IDA查看一下程序的基本结构"></a>1. 首先使用IDA查看一下程序的基本结构</h3><p>使用的是静态分析法</p>
+<p>程序运行的顺序：从IDA上看是上往下运行：start-&gt;sub_401052-&gt;sub_401137</p>
+<p><img src="/images/ChackSf/rgme_12.png" alt="image-20220307134942980"></p>
+<p>流程图：</p>
+<p><img src="/images/ChackSf/rgme_5.png" alt="image-20220307135620660"></p>
+<p>分析上面带汇编代码大可以分析出又两个分支结构，当cmp的比较值为0时就会跳到一个41024的地址，自然就跳过了第一个注册信息框，否则反之…</p>
+<p>所以破解绕过第一个弹窗的方法有：</p>
+<ol>
+<li>jmp</li>
+<li>jnz</li>
+<li>修改ep点，直接直接指向401024</li>
+</ol>
+<h3 id="2-通过修改EP点方式绕过第一个注册弹框"><a href="#2-通过修改EP点方式绕过第一个注册弹框" class="headerlink" title="2. 通过修改EP点方式绕过第一个注册弹框"></a>2. 通过修改EP点方式绕过第一个注册弹框</h3><p>破解整体思路：进入DOS头找到PE头地址，然后再PE可选头中找到EnterPoint（20）点和IamgeBases（32）,然后修改EnterPoint的值为1024</p>
+<p><img src="/images/ChackSf/rgme_6.png" alt="image-20220306193548969"></p>
+<p>通过WinHex工具找到的程序实际入口点为：</p>
+<p>AdderEnterPoint + ImageBases &#x3D; 41000</p>
+<h4 id="使用WinHex修改EP点"><a href="#使用WinHex修改EP点" class="headerlink" title="使用WinHex修改EP点"></a>使用WinHex修改EP点</h4><p>修改截图如下：</p>
+<p><img src="/images/ChackSf/rgme_7.png" alt="image-20220306204521671"></p>
+<p>修改点击保存后打开，果然绕过了第一注册弹窗</p>
+<p><img src="/images/ChackSf/rgme_8.png" alt="image-20220306204640327"></p>
+<h3 id="3-逆天改命"><a href="#3-逆天改命" class="headerlink" title="3. 逆天改命"></a>3. 逆天改命</h3><p>通过IDA的分析，是不是可以直接绕过前面两个弹窗的方法呢，就是直接把EP点修改为调用第二个窗口后的初始地址，汇编代码如下：</p>
+<p><img src="/images/ChackSf/rgme_9.png" alt="image-20220306205018718"></p>
+<p>根据上面的汇编代码，可以发现第二个窗口是由于调用sub_401052函数而弹出的，是不是可以直接绕过改点呢？</p>
+<p>所以直接把EP点修改为1039是不是就可以完美绕过前面两个弹窗呢？</p>
+<p><img src="/images/ChackSf/rgme_10.png" alt="image-20220306205252892"></p>
+<p>修改保存运行，发现完美的绕过了前面的两个弹窗</p>
+<p><img src="/images/ChackSf/rgme_11.png" alt="image-20220306205358077"></p>
 
         </div>
 
@@ -232,7 +261,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://ch3xd.github.io/2022/03/10/%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81%E7%AE%80%E5%8D%95%E8%A7%A3%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90/">http://ch3xd.github.io/2022/03/10/%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81%E7%AE%80%E5%8D%95%E8%A7%A3%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90/</a></span>
+                        <span><a href="http://ch3xd.github.io/2022/03/10/%E7%AE%80%E5%8D%95%E7%A0%B4%E8%A7%A3%E4%B9%8B%E4%BF%AE%E6%94%B9EP%E7%82%B9/">http://ch3xd.github.io/2022/03/10/%E7%AE%80%E5%8D%95%E7%A0%B4%E8%A7%A3%E4%B9%8B%E4%BF%AE%E6%94%B9EP%E7%82%B9/</a></span>
                     </p>
                 
                 
@@ -256,7 +285,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/%E6%B1%87%E7%BC%96%E5%9F%BA%E7%A1%80/"># 汇编基础</a>
+                        <a href="/tags/CrackMe/"># CrackMe</a>
                     
                         
                 </span>
@@ -269,10 +298,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/03/10/%E7%AE%80%E5%8D%95%E7%A0%B4%E8%A7%A3%E4%B9%8B%E4%BF%AE%E6%94%B9EP%E7%82%B9/">简单破解之修改EP点</a>
+                <a class="prev" rel="prev" href="/2022/03/10/%E7%AE%80%E5%8D%95%E7%A0%B4%E8%A7%A3%E4%B9%8BNOP%E5%A1%AB%E5%85%85/">简单破解之NOP填充</a>
             
             
-            <a class="next" rel="next" href="/2022/03/10/%E9%80%86%E5%90%91%E7%A0%B4%E8%A7%A3%E4%B9%8BPE%E7%BB%93%E6%9E%84DOS%E5%A4%B4%E8%A7%A3%E6%9E%90/">逆向破解之PE结构DOS头解析</a>
+            <a class="next" rel="next" href="/2022/03/10/%E6%B1%87%E7%BC%96%E4%BB%A3%E7%A0%81%E7%AE%80%E5%8D%95%E8%A7%A3%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90/">汇编代码简单解读与分析</a>
             
         </section>
 

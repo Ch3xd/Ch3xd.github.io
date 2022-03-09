@@ -13,7 +13,7 @@
 
 
 
-<title>逆向破解基础杂碎小结 | Hexo</title>
+<title>CrackMe-01 | Hexo</title>
 
 
 
@@ -193,7 +193,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">逆向破解基础杂碎小结</h1>
+            <h1 class="post-title">CrackMe-01</h1>
             
                 <div class="post-meta">
                     
@@ -202,7 +202,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">March 10, 2022&nbsp;&nbsp;2:29:18</a>
+                        Date: <a href="#">March 10, 2022&nbsp;&nbsp;2:37:09</a>
                         </span>
                     
                     
@@ -211,22 +211,45 @@
         </header>
 
         <div class="post-content">
-            <h3 id="1-逆向破解的一般流程"><a href="#1-逆向破解的一般流程" class="headerlink" title="1. 逆向破解的一般流程"></a>1. 逆向破解的一般流程</h3><h4 id="PE头分析"><a href="#PE头分析" class="headerlink" title="PE头分析"></a>PE头分析</h4><p>使用的软件：WinHex、PEditor、LordPE</p>
-<h4 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h4><p>使用软件推荐：IDA</p>
-<h5 id="动态分析"><a href="#动态分析" class="headerlink" title="动态分析"></a>动态分析</h5><p>使用软件推荐：ollydbg</p>
-<ol>
-<li>点开程序运行</li>
-<li>运行到关键位置暂停</li>
-<li>ALT + F9 返回程序领空（跟踪到程序运行的位置），返回程序领空后再F8跳到具体位置</li>
-<li>开始分析汇编和伪代码代码流程</li>
-</ol>
-<h4 id="常见的破解思路"><a href="#常见的破解思路" class="headerlink" title="常见的破解思路"></a>常见的破解思路</h4><h5 id="1-破解局部功能"><a href="#1-破解局部功能" class="headerlink" title="1. 破解局部功能"></a>1. 破解局部功能</h5><p>场景1：找到对应的弹出或者关键功能处，然后找到触发该功能或弹窗背后的函数（在ret处按回车跳到调用处），破解这个函数即可破解局部功能</p>
-<h5 id="2-破解注册功能"><a href="#2-破解注册功能" class="headerlink" title="2. 破解注册功能"></a>2. 破解注册功能</h5><p>思路：直接找到注册算法，然后破解注册算法即可完整的破解</p>
-<p><strong>误区：简单的去掉告警字符或者去掉告警弹窗是无法完成破解的，要找到背后的函数或判断</strong></p>
-<h3 id="2-使用IDA查看软件是否加了壳"><a href="#2-使用IDA查看软件是否加了壳" class="headerlink" title="2. 使用IDA查看软件是否加了壳"></a>2. 使用IDA查看软件是否加了壳</h3><p>使用IDA加载完后选择<code>View-&gt;Open subViews-&gt;String</code>或者使用快捷键<code>shift+F</code>即可跳到查看软件字符串界面，</p>
-<p>如果字符串没有出现乱码或者字符串通过肉眼能看得懂，那么就可以推断该软件没有加壳，否则反之。</p>
-<p><img src="/images/ChackSf/rgme_13.png" alt="image-20220307145955963"></p>
-<p>IDA常用快捷键：Ctrl + E 弹出程序入口窗口</p>
+            <h1 id="CrackMe-01"><a href="#CrackMe-01" class="headerlink" title="CrackMe-01"></a>CrackMe-01</h1><p>这次要破解的CrackMe第一关，难度一颗星：</p>
+<p><img src="/images/CrackImg/ckme_1.png" alt="image-20220308054707369"></p>
+<h3 id="一、静态分析"><a href="#一、静态分析" class="headerlink" title="一、静态分析"></a>一、静态分析</h3><p>使用IDA查看字符串，推断没有加壳，在使用winHex推出程序的入口处为：0x42FD68 </p>
+<p><img src="/images/CrackImg/ckme_3.png" alt="image-20220308060743245"></p>
+<p>使用PE查看进一步确认了EP点的值，可以看出是使用Delphi开发</p>
+<p><img src="/images/CrackImg/ckme_4.png" alt="image-20220308061223807"></p>
+<h3 id="二、简单使用软件"><a href="#二、简单使用软件" class="headerlink" title="二、简单使用软件"></a>二、简单使用软件</h3><p>简单的使用软件后发现，有两个检测功能，一个是需要账号&#x2F;密码，另一个只需要账号，点击按钮后，都会弹出检测失败的弹窗，使用过程如下图所示：</p>
+<p><img src="/images/CrackImg/ckme_2.png" alt="image-20220308055244225"></p>
+<h3 id="三、逆向追溯代码"><a href="#三、逆向追溯代码" class="headerlink" title="三、逆向追溯代码"></a>三、逆向追溯代码</h3><p>这里使用的是：返回领空堆栈跟踪法</p>
+<h4 id="1-返回领空retn破解法"><a href="#1-返回领空retn破解法" class="headerlink" title="1. 返回领空retn破解法"></a>1. 返回领空<code>retn</code>破解法</h4><p><strong>思路：主要通过<code>ALT + F9</code>返回用户领空，然后暂停到关键代码，然后再通过<code>F8</code>单步走retn来找到，执行该功能外的实际函数</strong></p>
+<p>使用ollybug运行软件，然后点击<code>Check it Bady</code>他弹框后，让ollybug暂停，然后再<code>ALT + F9</code>键，然后再点击<code>确认</code>按钮，这此ollybug暂停到了弹窗函数处：0x42A1AE，但是可以推测处该函数在0x42A1A9</p>
+<p><img src="/images/CrackImg/ckme_13.png" alt="image-20220308071345422"></p>
+<p>在0x42A1A9处下断点，然后<code>F9</code>运行，让程序运行到下段处，然后一直<code>F8</code>单步调试，一直找到真正的retn点，找到后就会跳到调用该窗口的函数了，如下图所示：在0x42A1E0，才是函数的出口点</p>
+<p><img src="/images/CrackImg/ckme_14.png" alt="image-20220308071608192"></p>
+<p>继续<code>F8</code>跳到执行函数处0x42F504</p>
+<p><img src="/images/CrackImg/ckme_15.png" alt="image-20220308072615456"></p>
+<p>往上追溯发现一个<code>jnz</code>不为零跳转的指令执行了触发了，失败的窗口</p>
+<p>破解点：把<code>jnz</code>改成<code>jn</code>或者<code>nop</code>掉</p>
+<p><img src="/images/CrackImg/ckme_16.png" alt="image-20220308072901194"></p>
+<p>再次点击运行，发现弹窗已经改成<code>God Job dude !! =)</code>了，到此破解成功</p>
+<p><img src="/images/CrackImg/ckme_17.png" alt="image-20220308073042898"></p>
+<h4 id="2-返回领空堆栈破解法"><a href="#2-返回领空堆栈破解法" class="headerlink" title="2.返回领空堆栈破解法"></a>2.返回领空堆栈破解法</h4><p>使用ollybug加载程序，然后进入单账号，点击<code>Check it Bady</code>按钮，然后返回ollybug暂停，然后按<code>ALT + K</code>组合键，然后会弹出堆栈窗口</p>
+<p>这里使用<code>ALT + K</code>使调用堆栈窗口，从堆栈窗口中可以看出有两个地方分别调用了MessageBox，上面是系统领空的（我们管不了），下面的是用户领空的代码，我们就需要下面执MessageBoxA函数的代码处为：0042A1AE，然后右键显示调用跳到IP点</p>
+<p><img src="/images/CrackImg/ckme_5.png" alt="image-20220308062855646"></p>
+<p>显示调用，跳到指定IP点</p>
+<p><img src="/images/CrackImg/ckme_6.png" alt="image-20220308063417978"></p>
+<p>然后在0x42A1A9处下断点和函数的入口0x42A170处下段，如下图所示：</p>
+<p><img src="/images/CrackImg/ckme_7.png" alt="image-20220308064020136"></p>
+<p>然后点击<code>Check it Bady</code>按钮触发事件，然后断点成功断到，0x42A170，然后来到堆栈窗口最近一条语句上右键-&gt;反汇编窗口跟随，然后会跳到调用该弹窗的函数执行处</p>
+<p><img src="/images/CrackImg/ckme_8.png" alt="image-20220308064628783"></p>
+<p>程序跳转到0x42F509，就可以发现实际调用的函数是Acid_bur.00422A170<img src="/images/CrackImg/ckme_9.png" alt="image-20220308064811721"></p>
+<p>然后继续往上推发现了一个关键跳转<code>jnz</code>为不为0时跳转，触发了执行该函数，那么破解思路就有了</p>
+<p>破解思路点：把<code>jnz</code>改成<code>jn</code>为0时跳转</p>
+<p><img src="/images/CrackImg/ckme_10.png" alt="image-20220308065118172"></p>
+<p>修改汇编代码：</p>
+<p><img src="/images/CrackImg/ckme_11.png" alt="image-20220308065351713"></p>
+<p>点击保存运行，发现弹窗信息已经改成<code>God Job dude !! =)</code>，说明破解成功</p>
+<p><img src="/images/CrackImg/ckme_12.png" alt="image-20220308065539593"></p>
+<p><strong>后面破解账号和密码处，也是用的同上的方法破解</strong></p>
 
         </div>
 
@@ -241,7 +264,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://ch3xd.github.io/2022/03/10/%E9%80%86%E5%90%91%E7%A0%B4%E8%A7%A3%E5%9F%BA%E7%A1%80%E6%9D%82%E7%A2%8E%E5%B0%8F%E7%BB%93/">http://ch3xd.github.io/2022/03/10/%E9%80%86%E5%90%91%E7%A0%B4%E8%A7%A3%E5%9F%BA%E7%A1%80%E6%9D%82%E7%A2%8E%E5%B0%8F%E7%BB%93/</a></span>
+                        <span><a href="http://ch3xd.github.io/2022/03/10/CrackMe-01/">http://ch3xd.github.io/2022/03/10/CrackMe-01/</a></span>
                     </p>
                 
                 
@@ -265,7 +288,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/%E9%80%86%E5%90%91%E5%9F%BA%E7%A1%80/"># 逆向基础</a>
+                        <a href="/tags/CrackMe/"># CrackMe</a>
                     
                         
                 </span>
@@ -278,10 +301,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/03/10/CrackMe-01/">CrackMe-01</a>
+                <a class="prev" rel="prev" href="/2022/03/10/CrackMe-02/">CrackMe-02</a>
             
             
-            <a class="next" rel="next" href="/2022/03/10/%E7%AE%80%E5%8D%95%E7%A0%B4%E8%A7%A3%E4%B9%8BNOP%E5%A1%AB%E5%85%85/">简单破解之NOP填充</a>
+            <a class="next" rel="next" href="/2022/03/10/%E9%80%86%E5%90%91%E7%A0%B4%E8%A7%A3%E5%9F%BA%E7%A1%80%E6%9D%82%E7%A2%8E%E5%B0%8F%E7%BB%93/">逆向破解基础杂碎小结</a>
             
         </section>
 

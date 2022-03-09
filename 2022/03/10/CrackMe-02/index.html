@@ -13,7 +13,7 @@
 
 
 
-<title>逆向破解基础杂碎小结 | Hexo</title>
+<title>CrackMe-02 | Hexo</title>
 
 
 
@@ -193,7 +193,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">逆向破解基础杂碎小结</h1>
+            <h1 class="post-title">CrackMe-02</h1>
             
                 <div class="post-meta">
                     
@@ -202,7 +202,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">March 10, 2022&nbsp;&nbsp;2:29:18</a>
+                        Date: <a href="#">March 10, 2022&nbsp;&nbsp;2:40:01</a>
                         </span>
                     
                     
@@ -211,22 +211,32 @@
         </header>
 
         <div class="post-content">
-            <h3 id="1-逆向破解的一般流程"><a href="#1-逆向破解的一般流程" class="headerlink" title="1. 逆向破解的一般流程"></a>1. 逆向破解的一般流程</h3><h4 id="PE头分析"><a href="#PE头分析" class="headerlink" title="PE头分析"></a>PE头分析</h4><p>使用的软件：WinHex、PEditor、LordPE</p>
-<h4 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h4><p>使用软件推荐：IDA</p>
-<h5 id="动态分析"><a href="#动态分析" class="headerlink" title="动态分析"></a>动态分析</h5><p>使用软件推荐：ollydbg</p>
-<ol>
-<li>点开程序运行</li>
-<li>运行到关键位置暂停</li>
-<li>ALT + F9 返回程序领空（跟踪到程序运行的位置），返回程序领空后再F8跳到具体位置</li>
-<li>开始分析汇编和伪代码代码流程</li>
-</ol>
-<h4 id="常见的破解思路"><a href="#常见的破解思路" class="headerlink" title="常见的破解思路"></a>常见的破解思路</h4><h5 id="1-破解局部功能"><a href="#1-破解局部功能" class="headerlink" title="1. 破解局部功能"></a>1. 破解局部功能</h5><p>场景1：找到对应的弹出或者关键功能处，然后找到触发该功能或弹窗背后的函数（在ret处按回车跳到调用处），破解这个函数即可破解局部功能</p>
-<h5 id="2-破解注册功能"><a href="#2-破解注册功能" class="headerlink" title="2. 破解注册功能"></a>2. 破解注册功能</h5><p>思路：直接找到注册算法，然后破解注册算法即可完整的破解</p>
-<p><strong>误区：简单的去掉告警字符或者去掉告警弹窗是无法完成破解的，要找到背后的函数或判断</strong></p>
-<h3 id="2-使用IDA查看软件是否加了壳"><a href="#2-使用IDA查看软件是否加了壳" class="headerlink" title="2. 使用IDA查看软件是否加了壳"></a>2. 使用IDA查看软件是否加了壳</h3><p>使用IDA加载完后选择<code>View-&gt;Open subViews-&gt;String</code>或者使用快捷键<code>shift+F</code>即可跳到查看软件字符串界面，</p>
-<p>如果字符串没有出现乱码或者字符串通过肉眼能看得懂，那么就可以推断该软件没有加壳，否则反之。</p>
-<p><img src="/images/ChackSf/rgme_13.png" alt="image-20220307145955963"></p>
-<p>IDA常用快捷键：Ctrl + E 弹出程序入口窗口</p>
+            <h2 id="CrackMe-02"><a href="#CrackMe-02" class="headerlink" title="CrackMe-02"></a>CrackMe-02</h2><p>这次破解的程序使用的VB编写</p>
+<p><img src="/images/CrackImg/ckme_1_0.png" alt="image-20220308082218412"></p>
+<p>这次破解CrackMe第二个软件：Afkayas.1，难度系数一颗星</p>
+<p><img src="/images/CrackImg/ckme_1_1.png" alt="image-20220308081714058"></p>
+<h3 id="一、查看软件、PE头信息等"><a href="#一、查看软件、PE头信息等" class="headerlink" title="一、查看软件、PE头信息等"></a>一、查看软件、PE头信息等</h3><h4 id="使用IDA查看是否有壳"><a href="#使用IDA查看是否有壳" class="headerlink" title="使用IDA查看是否有壳"></a>使用IDA查看是否有壳</h4><p>可以看出字符串都是明文状态，所以该软件没有加壳</p>
+<p><img src="/images/CrackImg/ckme_1_2.png" alt="image-20220308082726077"></p>
+<h4 id="WinHex算出的程序入口点为"><a href="#WinHex算出的程序入口点为" class="headerlink" title="WinHex算出的程序入口点为"></a>WinHex算出的程序入口点为</h4><p>使用WinHex推算出EP点为：001124，ImageBase：400000，程序入口点为：0x401124</p>
+<p><img src="/images/CrackImg/ckme_1_3.png" alt="image-20220308082929106"></p>
+<p>使用PE查看器进一步验证猜想</p>
+<p>根据该PE查看器可以看出，使用的VBS编写的32位程序</p>
+<p><img src="/images/CrackImg/ckme_1_4.png" alt="image-20220308083200360"></p>
+<h3 id="二、动态调试"><a href="#二、动态调试" class="headerlink" title="二、动态调试"></a>二、动态调试</h3><p>使用ollybug的：</p>
+<ul>
+<li>返回领空retn</li>
+<li>返回领空堆栈</li>
+</ul>
+<p>两个方法都没有顺利的找到父级函数</p>
+<p>所以这里直接就使用：返回领空往上追溯法</p>
+<p><img src="/images/CrackImg/ckme_1_5.png" alt="image-20220308084515930"></p>
+<p>在往上追溯的过程中我发现有一个<code>je</code>等于跳转指令，绕过了正常弹窗，执行了告警弹窗，进入汇编代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">je short Afkayas_.004025E5</span><br></pre></td></tr></table></figure>
+
+<p>破解思路：把<code>je</code>改成不等于跳转<code>jne</code></p>
+<p><img src="/images/CrackImg/ckme_1_6.png" alt="image-20220308084800102"></p>
+<p>然后<code>F9</code>运行，再去点击<code>OK</code>按钮，发现弹窗提示已经改成<code>You Get It KeyGen It Now</code>，自此第二关破解成功</p>
+<p><img src="/images/CrackImg/ckme_1_7.png" alt="image-20220308084931113"></p>
 
         </div>
 
@@ -241,7 +251,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://ch3xd.github.io/2022/03/10/%E9%80%86%E5%90%91%E7%A0%B4%E8%A7%A3%E5%9F%BA%E7%A1%80%E6%9D%82%E7%A2%8E%E5%B0%8F%E7%BB%93/">http://ch3xd.github.io/2022/03/10/%E9%80%86%E5%90%91%E7%A0%B4%E8%A7%A3%E5%9F%BA%E7%A1%80%E6%9D%82%E7%A2%8E%E5%B0%8F%E7%BB%93/</a></span>
+                        <span><a href="http://ch3xd.github.io/2022/03/10/CrackMe-02/">http://ch3xd.github.io/2022/03/10/CrackMe-02/</a></span>
                     </p>
                 
                 
@@ -265,7 +275,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/%E9%80%86%E5%90%91%E5%9F%BA%E7%A1%80/"># 逆向基础</a>
+                        <a href="/tags/CrackMe/"># CrackMe</a>
                     
                         
                 </span>
@@ -278,10 +288,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2022/03/10/CrackMe-01/">CrackMe-01</a>
             
-            
-            <a class="next" rel="next" href="/2022/03/10/%E7%AE%80%E5%8D%95%E7%A0%B4%E8%A7%A3%E4%B9%8BNOP%E5%A1%AB%E5%85%85/">简单破解之NOP填充</a>
+            <a class="next" rel="next" href="/2022/03/10/CrackMe-01/">CrackMe-01</a>
             
         </section>
 

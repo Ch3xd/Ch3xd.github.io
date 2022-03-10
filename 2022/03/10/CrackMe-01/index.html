@@ -232,7 +232,8 @@
 <p><img src="/images/CrackImg/ckme_16.png" alt="image-20220308072901194"></p>
 <p>再次点击运行，发现弹窗已经改成<code>God Job dude !! =)</code>了，到此破解成功</p>
 <p><img src="/images/CrackImg/ckme_17.png" alt="image-20220308073042898"></p>
-<h4 id="2-返回领空堆栈破解法"><a href="#2-返回领空堆栈破解法" class="headerlink" title="2.返回领空堆栈破解法"></a>2.返回领空堆栈破解法</h4><p>使用ollybug加载程序，然后进入单账号，点击<code>Check it Bady</code>按钮，然后返回ollybug暂停，然后按<code>ALT + K</code>组合键，然后会弹出堆栈窗口</p>
+<h4 id="2-返回领空堆栈破解法"><a href="#2-返回领空堆栈破解法" class="headerlink" title="2.返回领空堆栈破解法"></a>2.返回领空堆栈破解法</h4><p>ollydbg的堆栈视图反映了程序在运行期间函数的调用层次。</p>
+<p>使用ollybug加载程序，然后进入单账号，点击<code>Check it Bady</code>按钮，然后返回ollybug暂停，然后按<code>ALT + K</code>组合键，然后会弹出堆栈窗口</p>
 <p>这里使用<code>ALT + K</code>使调用堆栈窗口，从堆栈窗口中可以看出有两个地方分别调用了MessageBox，上面是系统领空的（我们管不了），下面的是用户领空的代码，我们就需要下面执MessageBoxA函数的代码处为：0042A1AE，然后右键显示调用跳到IP点</p>
 <p><img src="/images/CrackImg/ckme_5.png" alt="image-20220308062855646"></p>
 <p>显示调用，跳到指定IP点</p>
